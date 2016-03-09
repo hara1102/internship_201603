@@ -28,8 +28,6 @@ helpers do
     def sliceComment(s)
         @pos =s.index("#")
         return s if @pos == nil
-            
-        
         @comment = s.slice(0,@pos)
         return  @comment
     end
