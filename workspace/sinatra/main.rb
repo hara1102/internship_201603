@@ -11,6 +11,11 @@ ActiveRecord::Base.establish_connection(
 class Comment < ActiveRecord::Base
 end
 
+
+# 静的コンテンツ参照のためのパス設定
+set :public, File.dirname(__FILE__) + '/public'
+
+
 helpers do
     include Rack::Utils
     alias_method :h, :escape_html
@@ -46,6 +51,28 @@ helpers do
         return @trip
     end
 
+
+    # 画像をアップロード
+    def imageLord
+        if params[:file]
+            
+            save_path = "./public/images/#{params[:file][:filename]}"
+            
+	        File.open(save_path, 'wb') do |f|
+	            f.write params[:file][:tempfile].read
+	            @mes = ""
+	        end
+	        
+	        save_path = "./images/#{params[:file][:filename]}"
+            
+	        return save_path 
+	 
+        else
+	        @mes = "アップロードに失敗しました"
+	        return nil
+        end
+    end    
+	    
     
 end
 
@@ -61,7 +88,8 @@ post '/new' do
     params[:body]= sliceComment(params[:body]) +  trip10(@tripkey) 
     
     
-    Comment.create({:body => params[:body]})
+    Comment.create({:body => params[:body], :image => imageLord})
+    
     redirect '/'
 end
 
