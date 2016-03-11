@@ -61,9 +61,7 @@ helpers do
 	            @mes = ""
 	        end
 	        save_path = "./images/#{params[:file][:filename]}"
-            
 	        return save_path 
-	 
         else
 	        @mes = "アップロードに失敗しました"
 	        return nil
@@ -91,23 +89,5 @@ end
 post '/delete' do
     Comment.find(params[:id]).destroy
 
-end
-
-# アップロード処理
-post '/upload' do
-	if params[:file]
-       
-		save_path = "./public/images/#{params[:file][:filename]}"
-
-		File.open(save_path, 'wb') do |f|
-			f.write params[:file][:tempfile].read
-			@mes = ""
-		end
-		
-	else
-		@mes = "アップロードに失敗しました"
-	end
-	
-	redirect '/'
 end
 
