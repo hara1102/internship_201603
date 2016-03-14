@@ -10,14 +10,22 @@
   <ul>
       <% @comments.each do |comment| %>
       <li data-id = "<%= comment.id %>">
+         <% if comment.body != nil %>
           <%= h comment.body %>
+        <% end %>
+        <% if comment.image != nil %>
+          <br>
+          <img src =  <%= comment.image %> >
+        <% end %>
           <span class ="deleteCmd" style ="cursor:pointer;color:blue">[x]</span>
       </li>
       <% end %>
   </ul>
   <h2>Add New</h2>
-  <form method="post" action="/new">
+  <form method="post" action="/new" enctype = "multipart/form-data">
       <input type="text" name="body">  <input type="submit" value="post!">
+      <br>
+      <input type="file" name="file"> 
   </form>
   <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.0/jquery.min.js"></script>
   <script>
