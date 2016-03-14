@@ -8,9 +8,8 @@ ActiveRecord::Base.establish_connection(
   "database" => "./bbs.db"
 )
 
-class Comment < ActiveRecord::Base
-end
 
+Comment = Class.new(ActiveRecord::Base)
 
 helpers do
   include Rack::Utils
@@ -18,19 +17,19 @@ helpers do
   
   #トリップキーを返します
   def put_tripkey(s)
+      
     @pos =s.index("#")
     return nil if @pos == nil
+    
     @tripkey = s.slice(@pos,s.size)
-        
-    return @tripkey
   end
     
   #トリップキー以外を返します
   def slice_comment(s)
     @pos =s.index("#")
     return s if @pos == nil
+    
     @comment = s.slice(0,@pos)
-    return  @comment
   end
     
   #トリップキーを変換します
@@ -39,11 +38,10 @@ helpers do
     
     @salt = (tripkey + "H.").slice(1, tripkey.size)
     @salt = @salt.gsub(/[^\.-z]/, ".")
-    @salt = @salt.tr(":;<=>?@[\\]^_`", "ABCDEFGabcdef");
+    @salt = @salt.tr(":;<=>?@[\\]^_`", "ABCDEFGabcdef")
      
     # 末尾から10文字取り出す
     @trip = "◆" + tripkey.crypt(@salt).slice(-10, 10);
-    return @trip
   end
 
 
@@ -51,19 +49,14 @@ helpers do
   def image_load
     if params[:file]
       
-      @save_path = "./public/images/#{ params[:file][:filename] }"
+      @save_path = "./public/images/#{params[:file][:filename]}"
       
       File.open(@save_path, 'wb') do |f|
 	    f.write params[:file][:tempfile].read
-	  end
+      end
 	  
 	  #カレントディレクトリが[public]になっているのでpathを合わせる
 	  @load_path =  @save_path.gsub("public/", "./")
-      
-	  return @load_path 
-	 
-    else
-	  return nil
     end
   end    
 	    
