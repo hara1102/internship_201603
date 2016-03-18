@@ -1,7 +1,7 @@
 require 'sinatra'
 require 'sinatra/reloader'
 require 'active_record'
-require 'pry'
+require 'mail'
 
 ActiveRecord::Base.establish_connection(
   "adapter" => "sqlite3",
@@ -58,8 +58,30 @@ helpers do
 	  #カレントディレクトリが[public]になっているのでpathを合わせる
 	  @load_path =  @save_path.gsub("public/", "./")
     end
-  end    
-	    
+  end
+  
+   #mailを送信
+  def mail_smtp(body, image)
+    mail = Mail.new
+    options = { address:               "smtp.gmail.com",
+                port:                  587,
+                domain:                "smtp.gmail.com",
+                user_name:             ENV['MAIL_ADDRESS'],
+                password:              ENV['MAIL_PW'],
+                authentication:        :plain,
+                enable_starttls_auto:  true  }    
+    mail.charset = 'utf-8'
+    mail.from  ENV['MAIL_ADDRESS']
+    mail.to    ENV['MAIL_ADDRESS']   
+    mail.subject "インターンシップ課題掲示板：新しく投稿されました"
+    mail.body "新しく投稿されました \n\n ・#{body}" 
+    if image != nil
+      mail.add_file filename: image, content: File.read("./public/images/#{image}") 
+    end
+    mail.delivery_method(:smtp, options)
+    mail.deliver
+  end
+   
 end
 
 get '/' do
@@ -72,6 +94,8 @@ post '/new' do
   params[:body]= slice_comment(params[:body]) +  trip10(@tripkey)
   
   Comment.create({ body: params[:body], image: image_load })
+
+  mail_smtp(params[:body], params[:file][:filename])
 
   redirect '/'
 end
