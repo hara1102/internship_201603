@@ -2,6 +2,7 @@ require 'sinatra'
 require 'sinatra/reloader'
 require 'active_record'
 require 'mail'
+require 'pry'
 
 ActiveRecord::Base.establish_connection(
   "adapter" => "sqlite3",
@@ -63,17 +64,16 @@ helpers do
   #mailを送信
   def mail_smtp(body, image)
     mail = Mail.new
-
     options = { address:               "smtp.gmail.com",
                 port:                  587,
                 domain:                "smtp.gmail.com",
-                user_name:             'yamatoharakobe@gmail.com',
-                password:              '10gatu13niti',
+                user_name:             ENV['MAIL_ADDRESS'],
+                password:              ENV['MAIL_PW'],
                 authentication:        :plain,
                 enable_starttls_auto:  true  }    
     mail.charset = 'utf-8'
-    mail.from "yamatoharakobe@gmail.com"
-    mail.to "yamatoharakobe@gmail.com"    
+    mail.from  ENV['MAIL_ADDRESS']
+    mail.to    ENV['MAIL_ADDRESS']   
     mail.subject "インターンシップ課題掲示板：新しく投稿されました"
     mail.body "新しく投稿されました \n\n ・#{body}" 
     if image != nil
